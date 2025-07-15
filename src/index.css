@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Để trống hoặc chỉ giữ lại reset nếu cần */
