@@ -11,6 +11,7 @@ import {
   LogoutOutlined,
   CoffeeOutlined,
   CommentOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { NavLink, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthUser } from '../hooks/useAuthUser';
@@ -38,6 +39,9 @@ function getBreadcrumb(location: string) {
   if (location.includes('categories')) return ['Danh mục'];
   if (location.includes('keywords')) return ['Từ khóa'];
   if (location.includes('places')) return ['Địa điểm'];
+  if (location.includes('reviews')) return ['Bài viết đánh giá'];
+  if (location.includes('comments')) return ['Bình luận'];
+  if (location.includes('settings')) return ['Cài đặt'];
   return [];
 }
 
@@ -62,7 +66,7 @@ const AdminLayout: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider breakpoint="lg" collapsedWidth="0" className="!bg-gradient-to-b !from-orange-400 !to-yellow-200">
+      <Sider breakpoint="lg" collapsedWidth="0" className="!bg-gradient-to-b !from-gray-800 !to-gray-900">
         <div className="h-16 flex items-center justify-center text-white text-2xl font-bold tracking-wide gap-2">
           <CoffeeOutlined />
           <span>BEAN VIBES</span>
@@ -71,11 +75,28 @@ const AdminLayout: React.FC = () => {
           theme="dark"
           mode="inline"
           selectedKeys={[menuItems.find(item => location.pathname.startsWith(item.to))?.key || 'dashboard']}
-          className="!bg-transparent"
+          className="!bg-transparent !px-2 !py-2"
         >
           {menuItems.map(item => (
-            <Menu.Item key={item.key} icon={item.icon} className="!rounded-lg !my-1 !mx-2 hover:!bg-orange-200">
-              <NavLink to={item.to} className={({ isActive }) => isActive ? 'font-bold text-orange-600' : ''}>{item.label}</NavLink>
+            <Menu.Item 
+              key={item.key} 
+              icon={item.icon} 
+              className={`!rounded-lg !my-2 !mx-3 !px-4 !py-3 transition-all duration-200 ${
+                location.pathname.startsWith(item.to) 
+                  ? '!bg-blue-600 !text-white shadow-lg' 
+                  : 'hover:!bg-gray-700 !text-gray-300'
+              }`}
+            >
+              <NavLink 
+                to={item.to} 
+                className={({ isActive }) => 
+                  isActive 
+                    ? 'font-semibold text-white' 
+                    : 'text-gray-300 hover:text-white'
+                }
+              >
+                {item.label}
+              </NavLink>
             </Menu.Item>
           ))}
         </Menu>
@@ -83,22 +104,39 @@ const AdminLayout: React.FC = () => {
       <Layout>
         <Header className="bg-white shadow flex items-center justify-between px-6 z-10" style={{ padding: 0, minHeight: 64, height: 64, position: 'sticky', top: 0, background: '#fff', zIndex: 10, boxShadow: '0 2px 8px #f0f1f2' }}>
           <div className="flex items-center gap-3">
-            <CoffeeOutlined className="text-orange-400 text-2xl" />
+            <CoffeeOutlined className="text-gray-700 text-2xl" />
             <span className="font-semibold text-lg">Trang quản trị hệ thống review cafe Hà Nội</span>
           </div>
           <div className="flex items-center gap-3">
-            <Avatar style={{ backgroundColor: '#f59e42' }} icon={<UserOutlined />} />
+            <Avatar style={{ backgroundColor: '#4b5563' }} icon={<UserOutlined />} />
             <span className="font-medium text-gray-700">{user?.username}</span>
             <Dropdown overlay={menu} placement="bottomRight">
-              <Button icon={<LogoutOutlined />} type="text" className="!text-orange-500 hover:!text-orange-700">Đăng xuất</Button>
+              <Button icon={<LogoutOutlined />} type="text" className="!text-gray-600 hover:!text-gray-800">Đăng xuất</Button>
             </Dropdown>
           </div>
         </Header>
         <Content className="m-4">
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Admin</Breadcrumb.Item>
+          <Breadcrumb className="mb-6">
+            <Breadcrumb.Item>
+              <NavLink to="/admin/settings" className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                <UserOutlined />
+                Admin
+              </NavLink>
+            </Breadcrumb.Item>
             {breadcrumb.map((b) => (
-              <Breadcrumb.Item key={b}>{b}</Breadcrumb.Item>
+              <Breadcrumb.Item key={b} className="text-gray-600 flex items-center gap-1">
+                {b === 'Dashboard' && <DashboardOutlined />}
+                {b === 'Người dùng' && <UserOutlined />}
+                {b === 'Kiểm duyệt' && <FileProtectOutlined />}
+                {b === 'Báo cáo' && <FlagOutlined />}
+                {b === 'Danh mục' && <AppstoreOutlined />}
+                {b === 'Từ khóa' && <KeyOutlined />}
+                {b === 'Địa điểm' && <EnvironmentOutlined />}
+                {b === 'Bài viết đánh giá' && <FileProtectOutlined />}
+                {b === 'Bình luận' && <CommentOutlined />}
+                {b === 'Cài đặt' && <SettingOutlined />}
+                {b}
+              </Breadcrumb.Item>
             ))}
           </Breadcrumb>
           <div className="bg-white p-8 min-h-[360px] rounded-xl shadow">

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Input, Tag, message, Space } from 'antd';
 import { getPendingPlaces, approvePlace, rejectPlace } from '../../api/adminPlaces';
+import { useConfirmModal } from '../../hooks/useConfirmModal';
 
 interface Place {
   id: string;
@@ -17,6 +18,7 @@ const PlacesPending: React.FC = () => {
   const [detail, setDetail] = useState<Place | null>(null);
   const [rejectModal, setRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const { showApproveConfirm } = useConfirmModal();
 
   const fetchPlaces = async () => {
     setLoading(true);
@@ -27,11 +29,13 @@ const PlacesPending: React.FC = () => {
 
   useEffect(() => { fetchPlaces(); }, []);
 
-  const handleApprove = async (id: string) => {
-    await approvePlace(id);
-    message.success('Đã duyệt địa điểm!');
-    fetchPlaces();
-    setDetail(null);
+  const handleApprove = async (id: string, name: string) => {
+    showApproveConfirm(name, async () => {
+      await approvePlace(id);
+      message.success('Đã duyệt địa điểm!');
+      fetchPlaces();
+      setDetail(null);
+    });
   };
   const handleReject = async () => {
     if (!detail) return;
@@ -68,7 +72,7 @@ const PlacesPending: React.FC = () => {
         open={!!detail}
         onCancel={() => setDetail(null)}
         footer={detail && detail.status === 'pending' ? [
-          <Button key="approve" type="primary" onClick={() => handleApprove(detail.id)}>Duyệt</Button>,
+          <Button key="approve" type="primary" onClick={() => handleApprove(detail.id, detail.name)}>Duyệt</Button>,
           <Button key="reject" danger onClick={() => setRejectModal(true)}>Từ chối</Button>,
         ] : null}
       >
